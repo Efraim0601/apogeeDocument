@@ -1,7 +1,13 @@
 package com.apogeeDocument.apogeeDocument.security;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 
 public class EmailValidator {
     public boolean validateEmail(String email) {
