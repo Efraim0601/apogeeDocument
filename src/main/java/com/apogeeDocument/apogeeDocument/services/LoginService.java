@@ -35,7 +35,7 @@ public class LoginService {
 
 
         // vérification de la présence d'un email dans la base de donnée
-        Optional<User> userOptional = Optional.ofNullable(this.userRepository.findByEmail(user.getEmail()));
+        Optional<User> userOptional = this.userRepository.findByEmail(user.getEmail());
         if (userOptional.isPresent()){
             throw new RuntimeException("Email already used!!! ");
         }

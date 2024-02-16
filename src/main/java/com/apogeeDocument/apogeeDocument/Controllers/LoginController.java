@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @AllArgsConstructor
 @NoArgsConstructor
-@RequestMapping(path = "login")
+@RequestMapping(path = "loginn")
 public class LoginController {
 
     private LoginService loginService;

@@ -11,6 +11,9 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +26,7 @@ import java.util.Optional;
 @AllArgsConstructor
 @NoArgsConstructor
 @Service
-public class UserService {
+public class UserService implements UserDetailsService {
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -48,7 +51,7 @@ public class UserService {
 
 
         // vérification de la présence d'un email dans la base de donnée
-        Optional<User> userOptional = Optional.ofNullable(this.userRepository.findByEmail(user.getEmail()));
+        Optional<User> userOptional = this.userRepository.findByEmail(user.getEmail());
         if (userOptional.isPresent()){
             throw new RuntimeException("Email already used!!! ");
         }
@@ -63,8 +66,8 @@ public class UserService {
         user.setWording(role);
 
         //enregistrement de l'utilisateur et vérification de la présence d'un utilisateur dans la base de donnée
-         User userInDatabase = this.userRepository.findByEmail(user.getEmail());
-                if(userInDatabase ==null){
+         Optional<User> userInDatabase = this.userRepository.findByEmail(user.getEmail());
+                if(userInDatabase.isEmpty()){
                     user = this.userRepository.save(user);
                     this.validationService.keppValidation(user);
                }
@@ -113,6 +116,13 @@ public class UserService {
         }
         User activeuser = this.userRepository.findById(validation.getUser().getNumero_employe()).orElseThrow(()->new RuntimeException("Unknown user !!!"));
         activeuser.setActive(true);
+        validation.setActivation(Instant.now());
         this.userRepository.save(activeuser);
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        return this.userRepository.findByEmail(username).orElseThrow(()->new RuntimeException("no user matched !!!"));
+
     }
 }
