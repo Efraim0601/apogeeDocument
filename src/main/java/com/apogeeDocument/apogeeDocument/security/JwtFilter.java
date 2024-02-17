@@ -1,6 +1,7 @@
 package com.apogeeDocument.apogeeDocument.security;
 
-import com.apogeeDocument.apogeeDocument.entites.User;
+import com.apogeeDocument.apogeeDocument.entites.Jwt;
+import com.apogeeDocument.apogeeDocument.services.JwtService;
 import com.apogeeDocument.apogeeDocument.services.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -29,16 +30,21 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String userName = null;
         String token = null;
+        Jwt tokenInDatabase = null;
         boolean isTokenExpired = true;
 
         final String authorisation = request.getHeader("Authorisation");
         if(authorisation != null && authorisation.startsWith("jeton ") ){
             token = authorisation.substring(6);
+            tokenInDatabase = this.jwtService.tokenByValue(token);
             userName= jwtService.getUserName(token);
             isTokenExpired = jwtService.isTokenExpired(token);
         }
 
-        if (userName != null && SecurityContextHolder.getContext().getAuthentication() == null){
+        if (!isTokenExpired
+                && tokenInDatabase.getUser().getEmail().equals(userName)
+                && userName != null
+                && SecurityContextHolder.getContext().getAuthentication() == null){
             UserDetails userDetails = userService.loadUserByUsername(userName);
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails ,null,userDetails.getAuthorities() );
 

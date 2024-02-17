@@ -44,6 +44,8 @@ public class ApplicationConfigSecurity {
                                                 .requestMatchers( POST,"/user").permitAll()
                                                 .requestMatchers( POST,"/activation").permitAll()
                                                 .requestMatchers( POST,"/login").permitAll()
+                                                .requestMatchers( POST,"/new-password").permitAll()
+                                                .requestMatchers( POST,"/change-Password").permitAll()
                                                 .anyRequest().authenticated()
                         )
                         .sessionManagement(httpSecuritySessionManagementConfigurer ->

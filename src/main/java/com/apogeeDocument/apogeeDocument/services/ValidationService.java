@@ -4,7 +4,10 @@ import com.apogeeDocument.apogeeDocument.entites.User;
 import com.apogeeDocument.apogeeDocument.entites.Validation;
 import com.apogeeDocument.apogeeDocument.repositories.ValidationRepository;
 import com.apogeeDocument.apogeeDocument.services.NotificationService;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -12,6 +15,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.Random;
 
 @Service
+@Transactional
+@Slf4j
 @AllArgsConstructor
 public class ValidationService {
     private NotificationService notificationService;
@@ -40,4 +45,12 @@ public class ValidationService {
     public Validation getByCode(String code) {
         return this.validationRepository.findByCode(code).orElseThrow(()->new RuntimeException("invalide activation key !!!"));
     }
+
+     @Scheduled(cron = "*/30*****")
+    public void cleaningTable(){
+        final  Instant now = Instant.now();
+        log.info("delete token at {}", now);
+
+        this.validationRepository.deleteAllByExpireBefore(Instant.now());
+     }
 }

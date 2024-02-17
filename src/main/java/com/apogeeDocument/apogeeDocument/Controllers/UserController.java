@@ -2,7 +2,7 @@ package com.apogeeDocument.apogeeDocument.Controllers;
 
 import com.apogeeDocument.apogeeDocument.dto.AuthenticationDTO;
 import com.apogeeDocument.apogeeDocument.entites.User;
-import com.apogeeDocument.apogeeDocument.security.JwtService;
+import com.apogeeDocument.apogeeDocument.services.JwtService;
 import com.apogeeDocument.apogeeDocument.services.UserService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -69,6 +69,30 @@ public class UserController {
         this.userService.activation(actvaiton);
         log.info("Inscription effectuée !!!!!!");
     }
+
+
+    /*
+     *
+     * change password
+     *
+     * */
+    @PostMapping(path = "change-Password")
+    public void changePassword(@RequestBody Map<String, String> activation){
+        this.userService.changePassword(activation);
+    }
+
+    /*
+     *
+     * new password
+     *
+     * */
+    @PostMapping(path = "new-password")
+    public void newPassword(@RequestBody Map<String, String> activation){
+        this.userService.newPassword(activation);
+    }
+
+
+
 
     /*
      *

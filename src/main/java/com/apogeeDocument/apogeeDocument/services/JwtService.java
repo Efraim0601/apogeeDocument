@@ -1,7 +1,8 @@
-package com.apogeeDocument.apogeeDocument.security;
+package com.apogeeDocument.apogeeDocument.services;
 
+import com.apogeeDocument.apogeeDocument.entites.Jwt;
 import com.apogeeDocument.apogeeDocument.entites.User;
-import com.apogeeDocument.apogeeDocument.services.UserService;
+import com.apogeeDocument.apogeeDocument.repositories.JwtRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -13,22 +14,45 @@ import org.springframework.stereotype.Service;
 import java.security.Key;
 import java.util.Date;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.Function;
 
 @Service
 @AllArgsConstructor
 public class JwtService {
+    public static final String BEARER = "jeton";
     private UserService userService;
+    private final JwtRepository jwtRepository;
     private final String ENCRYPTION_KEY ="eFsvjkP9M2d1sc+miVGmkqFAhqt+cHhVZUWYe6P/SUs=";
+
+
+
+    public Jwt tokenByValue(String value){
+        return this.jwtRepository.findByValueAndDisabledAndExpired(
+                value,
+                false,
+                false
+        ).orElseThrow(()-> new RuntimeException(""));
+    }
     public Map<String, String> get(String username){
         User user = (User)this.userService.loadUserByUsername((username));
-        return this.getJWT(user);
+        final Map<String, String> jwtMap = this.getJWT(user);
+
+
+        final Jwt  jwt = Jwt
+                .builder()
+                .value(BEARER)
+                .disabled(false)
+                .expired(false)
+                .user(user)
+                .build();
+        this.jwtRepository.save(jwt);
+
+        return  jwtMap;
     }
 
     private Map<String, String> getJWT(User user) {
-        final long cureentTime = System.currentTimeMillis();
-        final long expireTime = cureentTime + 30*60*1000;
+        final long curentTime = System.currentTimeMillis();
+        final long expireTime = curentTime + 30*60*1000;
 
         final Map<String, Object> claims = Map.of(
                 "name", user.getName(),
@@ -39,13 +63,13 @@ public class JwtService {
 
 
         final String jeton = Jwts.builder()
-                .setIssuedAt(new Date(cureentTime))
+                .setIssuedAt(new Date(curentTime))
                 .setExpiration(new Date(expireTime))
                 .setSubject(user.getEmail())
                 .setClaims(claims)
                 .signWith(getKey(), SignatureAlgorithm.HS256)
                 .compact();
-        return Map.of("jeton", jeton);
+        return Map.of(BEARER, jeton);
     }
 
     private Key getKey() {

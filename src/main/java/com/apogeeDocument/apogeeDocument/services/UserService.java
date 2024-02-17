@@ -121,8 +121,23 @@ public class UserService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+    public User loadUserByUsername(String email) throws UsernameNotFoundException {
         return this.userRepository.findByEmail(email).orElseThrow(()->new RuntimeException("no user matched !!!"));
+
+    }
+
+    public void changePassword(Map<String, String> args) {
+        User user = this.loadUserByUsername(args.get("email"));
+        this.validationService.keppValidation(user);
+    }
+
+    public void newPassword(Map<String, String> args) {
+        User user = this.loadUserByUsername(args.get("email"));
+        final Validation validation = validationService.getByCode(args.get("code"));
+        if(validation.getUser().getEmail().equals(user.getEmail())){
+            String cryptPassword = this.passwordEncoder.encode(args.get("password"));
+            user.setPassword(cryptPassword);
+        }
 
     }
 }

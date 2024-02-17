@@ -1,29 +1,27 @@
 package com.apogeeDocument.apogeeDocument.entites;
 
-
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-import java.time.Instant;
-
-@Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "VALIDATION")
+@Getter
+@Builder
 @Entity
-public class Validation {
+@Table(name = "jwt")
+public class Jwt {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    private Instant creation;
-    private Instant expire;
-    private Instant activation;
-    private String code;
+    private String value;
+    private boolean disabled;
+    private boolean expired;
 
-    @OneToOne(cascade = {CascadeType.MERGE,CascadeType.DETACH})
+    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE})
+    @JoinColumn(name = "User_id")
     private User user;
+
 }
