@@ -1,9 +1,8 @@
 package com.apogeeDocument.apogeeDocument.security;
 
-import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
+import com.apogeeDocument.apogeeDocument.services.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -48,9 +47,9 @@ public class ApplicationConfigSecurity {
     }
 
     @Bean
-    public AuthenticationProvider authenticationProvider(UserDetailsService userDetailsService){
+    public AuthenticationProvider authenticationProvider(UserService userService){
         DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
-        daoAuthenticationProvider.setUserDetailsService(userDetailsService);
+        daoAuthenticationProvider.setUserDetailsService(userService);
         daoAuthenticationProvider.setPasswordEncoder(this.passwordEncoder());
         return daoAuthenticationProvider;
     }

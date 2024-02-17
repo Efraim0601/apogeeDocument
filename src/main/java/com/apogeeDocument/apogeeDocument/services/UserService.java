@@ -108,8 +108,8 @@ public class UserService implements UserDetailsService {
      *
      */
 
-    public void activation(Map<String, String> actvaiton) {
-        Validation validation = this.validationService.getByCode(actvaiton.get("code"));
+    public void activation(Map<String, String> activation) {
+        Validation validation = this.validationService.getByCode(activation.get("code"));
 
         if(Instant.now().isAfter(validation.getExpire())){
             throw  new RuntimeException("Your activation key has expired");
@@ -121,8 +121,8 @@ public class UserService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return this.userRepository.findByEmail(username).orElseThrow(()->new RuntimeException("no user matched !!!"));
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        return this.userRepository.findByEmail(email).orElseThrow(()->new RuntimeException("no user matched !!!"));
 
     }
 }

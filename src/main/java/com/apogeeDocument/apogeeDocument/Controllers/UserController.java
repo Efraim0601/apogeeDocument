@@ -2,6 +2,7 @@ package com.apogeeDocument.apogeeDocument.Controllers;
 
 import com.apogeeDocument.apogeeDocument.dto.AuthenticationDTO;
 import com.apogeeDocument.apogeeDocument.entites.User;
+import com.apogeeDocument.apogeeDocument.security.JWTservice;
 import com.apogeeDocument.apogeeDocument.services.UserService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +25,7 @@ public class UserController {
 
     private AuthenticationManager authenticationManager;
     private UserService userService;
+    private JWTservice jwTservice;
 
     /*
     *
@@ -41,12 +43,18 @@ public class UserController {
      * login part
      *
      * */
+    @ResponseStatus(value = HttpStatus.CREATED)
     @PostMapping(path = "login")
-    public Map<String, String> login(@RequestBody AuthenticationDTO authenticationDTO){
-        Authentication authenticate = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(authenticationDTO.username(), authenticationDTO.passwod())
+    public Map<String, String> userLogin(@RequestBody AuthenticationDTO authenticationDTO){
+
+        final Authentication authenticate = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(authenticationDTO.email(), authenticationDTO.password())
         );
-        log.info("resultat: {}", authenticate.isAuthenticated());
+        if (authenticate.isAuthenticated()){
+            return this.jwTservice.get(authenticationDTO.email());
+        }
+        log.info("reussi!!!");
+
         return null;
     }
 

@@ -1,4 +1,4 @@
 package com.apogeeDocument.apogeeDocument.dto;
 
-public record AuthenticationDTO(String username, String passwod) {
+public record AuthenticationDTO(String email, String password) {
 }
