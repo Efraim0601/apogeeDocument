@@ -10,9 +10,11 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import static org.springframework.http.HttpMethod.POST;
 
@@ -20,6 +22,16 @@ import static org.springframework.http.HttpMethod.POST;
 @Configuration
 @EnableWebSecurity
 public class ApplicationConfigSecurity {
+
+
+
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final JwtFilter jwtFilter;
+    public ApplicationConfigSecurity(BCryptPasswordEncoder bCryptPasswordEncoder, JwtFilter jwtFilter) {
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        this.jwtFilter = jwtFilter;
+    }
+
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception{
@@ -33,13 +45,14 @@ public class ApplicationConfigSecurity {
                                                 .requestMatchers( POST,"/activation").permitAll()
                                                 .requestMatchers( POST,"/login").permitAll()
                                                 .anyRequest().authenticated()
-                        ).build();
+                        )
+                        .sessionManagement(httpSecuritySessionManagementConfigurer ->
+                                httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                        )
+                        .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                        .build();
     }
 
-    @Bean
-    BCryptPasswordEncoder passwordEncoder(){
-        return new BCryptPasswordEncoder();
-    }
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
@@ -50,7 +63,7 @@ public class ApplicationConfigSecurity {
     public AuthenticationProvider authenticationProvider(UserService userService){
         DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
         daoAuthenticationProvider.setUserDetailsService(userService);
-        daoAuthenticationProvider.setPasswordEncoder(this.passwordEncoder());
+        daoAuthenticationProvider.setPasswordEncoder(this.bCryptPasswordEncoder);
         return daoAuthenticationProvider;
     }
 }

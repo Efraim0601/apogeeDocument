@@ -2,7 +2,7 @@ package com.apogeeDocument.apogeeDocument.Controllers;
 
 import com.apogeeDocument.apogeeDocument.dto.AuthenticationDTO;
 import com.apogeeDocument.apogeeDocument.entites.User;
-import com.apogeeDocument.apogeeDocument.security.JWTservice;
+import com.apogeeDocument.apogeeDocument.security.JwtService;
 import com.apogeeDocument.apogeeDocument.services.UserService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +25,7 @@ public class UserController {
 
     private AuthenticationManager authenticationManager;
     private UserService userService;
-    private JWTservice jwTservice;
+    private JwtService jwTservice;
 
     /*
     *
